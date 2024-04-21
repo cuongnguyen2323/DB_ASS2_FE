@@ -11,7 +11,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePageScreen />}></Route>
         <Route path="/list" element={<HomePageScreen />}></Route>
-        <Route path="/detail" element={<DetailPage />}></Route>
+        <Route path="/detail/:orderId" element={<DetailPage />}></Route>
       </Routes>
     </Router>
   );

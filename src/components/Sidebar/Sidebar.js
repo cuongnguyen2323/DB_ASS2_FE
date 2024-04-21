@@ -6,13 +6,12 @@ export default function Sidebar() {
   return (
     //<div className="container-fluid">
     <div style={{ width: 300 }}>
-      <div className="row ">
+      <div className="row " style={{ height: "100%" }}>
         <div
-          //className=" col-auto col-md-2 min-vh-100 "
-          className=" col-auto min-vh-100 "
+          className=" col-auto  min-vh-100 "
           style={{
             backgroundColor: "white",
-            borderRight: "1px solid grey",
+            borderRight: " 1px solid grey",
           }}
         >
           <div className="d-flex align-items-center justify-content-center">

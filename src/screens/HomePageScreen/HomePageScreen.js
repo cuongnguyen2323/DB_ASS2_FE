@@ -7,34 +7,46 @@ import { Navbar, Nav, Form, Row, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 const tableHead = [
+  "Mã đơn hàng",
   "Mã vận đơn",
   "Ngày giao hàng",
   "Người giao hàng",
-  "Tình trạng",
+
   "Tổng tiền ",
   "",
 ];
 
 const productOrder = [
   {
-    id: "111",
-    date: "23/06/2023",
+    orderId: "1",
+    id: "111.1, 111.2",
+    date: "02/05/2024",
     shipper: "Nguyen Van A",
-    status: "pending",
+
     total: "200.000 VNĐ",
   },
   {
+    orderId: "2",
     id: "222",
-    date: "23/06/2023",
+    date: "02/05/2024",
     shipper: "Tran Tuan B",
-    status: "pending",
+
     total: "200.000 VNĐ",
   },
   {
+    orderId: "3",
     id: "333",
-    date: "23/06/2023",
+    date: "02/05/2024",
     shipper: "Le Vu C",
-    status: "pending",
+
+    total: "200.000 VNĐ",
+  },
+  {
+    orderId: "4",
+    id: "444",
+    date: "03/04/2024",
+    shipper: "Ly Thi D",
+
     total: "200.000 VNĐ",
   },
 ];
@@ -57,9 +69,9 @@ const HomePageScreen = () => {
     setResult(filteredResults);
   };
   const navigate = useNavigate();
-  const handleEditButton = (e) => {
-    e.preventDefault();
-    navigate("/detail");
+  const handleEditButton = (orderId) => {
+    // e.preventDefault();
+    navigate(`/detail/${orderId}`);
   };
 
   return (
@@ -79,7 +91,7 @@ const HomePageScreen = () => {
           className="text-center"
           style={{ fontFamily: "Work Sans", fontSize: 40, fontWeight: 500 }}
         >
-          Quản lý đơn hàng
+          Quản lý đơn hàng chưa được giao
         </div>
         {/* <div style={{ display: "flex" }}> */}
         <Form
@@ -105,18 +117,18 @@ const HomePageScreen = () => {
             <BsSearch />
           </Button>
 
-          <Button
+          {/* <Button
             type="submit"
             size="sm"
             className="rounded-3 "
             style={{
               backgroundColor: "#218187",
               marginLeft: 100,
-              width: "150px",
+              width: "190px",
             }}
           >
-            Thêm đơn
-          </Button>
+            Thêm kiện hàng
+          </Button> */}
         </Form>
         {/* </div> */}
         <Table responsive className="mt-4" bordered>
@@ -151,10 +163,11 @@ const HomePageScreen = () => {
             {result.map((order, index) => (
               <tr>
                 <td>{index}</td>
+                <td>{order.orderId}</td>
                 <td>{order.id}</td>
                 <td>{order.date}</td>
                 <td>{order.shipper}</td>
-                <td>{order.status}</td>
+
                 <td>{order.total}</td>
                 <td>
                   <div style={{ display: "flex" }}>
@@ -166,11 +179,27 @@ const HomePageScreen = () => {
                         backgroundColor: "white",
                         fontWeight: 500,
                         flex: 1,
+                        width: "60px",
                         marginRight: "5px",
+                        // marginLeft: "5px",
                       }}
-                      onClick={handleEditButton}
                     >
-                      Chỉnh sửa
+                      Sửa
+                    </Button>
+                    <Button
+                      size="sm"
+                      style={{
+                        color: "#218187",
+                        border: "1px solid #218187",
+                        backgroundColor: "white",
+                        fontWeight: 500,
+                        flex: 1,
+                        marginRight: "5px",
+                        width: "60px",
+                      }}
+                      onClick={() => handleEditButton(order.orderId)}
+                    >
+                      Chi tiết
                     </Button>
                     <Button
                       size="sm"
@@ -180,7 +209,7 @@ const HomePageScreen = () => {
                         backgroundColor: "white",
                         fontWeight: 500,
                         flex: 1,
-                        marginLeft: "5px",
+                        // marginLeft: "5px",
                       }}
                     >
                       Xoá
