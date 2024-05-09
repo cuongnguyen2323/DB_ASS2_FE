@@ -1,52 +1,52 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 import AddIcon from "@mui/icons-material/Add";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import { useParams } from "react-router-dom";
+import axios from "axios";
 
 const tableHead = [
   "Mã sản phẩm",
-  "Tên sản phẩm",
+  "Loại",
+  "Tên",
   "Giá tiền/sản phẩm",
   "Số lượng",
-  "Giá tiền",
+  "DeliveryId",
+  "Tình trạng",
   "",
-];
-
-const product = [
-  {
-    id: "11",
-    name: "Hạt cho mèo gói siêu tiện lợi 300g",
-    price_product: "100.000 VNĐ",
-    unit: "1",
-    total: "100.000 VNĐ",
-  },
-  {
-    id: "22",
-    name: "Hạt cho mèo gói siêu tiện lợi 300g",
-    price_product: "100.000 VNĐ",
-    unit: "1",
-    total: "100.000 VNĐ",
-  },
-  {
-    id: "33",
-    name: "Hạt cho mèo gói siêu tiện lợi 300g",
-    price_product: "100.000 VNĐ",
-    unit: "1",
-    total: "100.000 VNĐ",
-  },
-  {
-    id: "44",
-    name: "Hạt cho mèo gói siêu tiện lợi 300g",
-    price_product: "100.000 VNĐ",
-    unit: "2",
-    total: "200.000 VNĐ",
-  },
 ];
 
 export default function DetailPage() {
   const { orderId } = useParams();
+  const [orderDetail, setOrderDetail] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get(`/api/v1/order/views?id=${orderId}`)
+      .then((res) => {
+        console.log(res.data.content);
+        setOrderDetail(res.data.content);
+      })
+      .catch((err) => {
+        // console.error(err);
+      });
+  }, []);
+
+  const [orderItem, setOrderItem] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get(`/api/v1/order/views/${orderId}/details`)
+      .then((res) => {
+        console.log(res.data);
+        setOrderItem(res.data);
+      })
+      .catch((err) => {
+        // console.error(err);
+      });
+  }, []);
+
   return (
     <div style={{ display: "flex" }}>
       <Sidebar />
@@ -57,7 +57,7 @@ export default function DetailPage() {
         >
           Thông tin đơn hàng số {orderId}
         </div>
-        <div className="d-flex mt-4 " style={{ marginLeft: "10%" }}>
+        {/* <div className="d-flex mt-4 " style={{ marginLeft: "10%" }}>
           <Button
             type="submit"
             size="sm"
@@ -73,56 +73,37 @@ export default function DetailPage() {
           <div style={{ fontFamily: "Work Sans", fontSize: 20, marginLeft: 5 }}>
             Thêm sản phẩm
           </div>
-        </div>
-        <Table
-          responsive
-          className="mt-4 "
-          style={{
-            //border: "1px solid grey ",
-            maxWidth: "80%",
-            marginLeft: "10%",
-
-            //borderRadius: "100px",
-          }}
-          //bordered
-        >
-          <thead>
-            <tr>
-              <th
-                style={{
-                  backgroundColor: "#E1F2F3",
-                  fontFamily: "Work Sans",
-                  fontWeight: 600,
-                }}
-              >
-                STT
-              </th>
-
-              {tableHead.map((h, index) => (
-                <th
-                  key={index}
-                  style={{
-                    backgroundColor: "#E1F2F3",
-                    fontFamily: "Work Sans",
-                    fontWeight: 600,
-                  }}
-                >
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-
-          <tbody>
-            {product.map((product, index) => (
+        </div> */}
+        <div style={{ width: "100%", marginLeft: 40 }}>
+          <Table responsive className="mt-4" style={{}}>
+            <thead>
               <tr>
-                <td>{index}</td>
-                <td>{product.id}</td>
-                <td>{product.name}</td>
-                <td>{product.price_product}</td>
-                <td>{product.unit}</td>
-                <td>{product.total}</td>
-                <td>
+                {tableHead.map((h, index) => (
+                  <th
+                    key={index}
+                    style={{
+                      backgroundColor: "#E1F2F3",
+                      fontFamily: "Work Sans",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+
+            <tbody>
+              {orderItem.map((product, index) => (
+                <tr>
+                  <td>{product.id}</td>
+                  <td>{product.type}</td>
+                  <td>{product.itemName}</td>
+                  <td>{product.priceEach}</td>
+                  <td>{product.quantity}</td>
+                  <td>{product.deliveryId}</td>
+                  <td>{product.deliveryStatus}</td>
+                  {/* <td>
                   <div style={{ display: "flex" }}>
                     <Button
                       size="sm"
@@ -154,11 +135,12 @@ export default function DetailPage() {
                       Xoá
                     </Button>
                   </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+                </td> */}
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </div>
         <div style={{ marginLeft: "10%", marginTop: 20 }}>
           <div className="d-flex flex-row">
             <div style={{ fontFamily: "Work Sans", fontSize: 22 }}>
@@ -172,13 +154,13 @@ export default function DetailPage() {
                 marginLeft: 10,
               }}
             >
-              500.000 VNĐ
+              {orderDetail.length > 0 && orderDetail[0].price}
             </div>
           </div>
 
           <div style={{ marginTop: 30 }}>
             <div style={{ fontFamily: "Work Sans", fontSize: 22 }}>
-              Phương thức thanh toán:{" "}
+              Tình trạng:
             </div>
             <div
               style={{
@@ -187,13 +169,13 @@ export default function DetailPage() {
                 color: "#868686",
               }}
             >
-              Thanh toán khi nhận hàng
+              {orderDetail.length > 0 && orderDetail[0].status}
             </div>
           </div>
 
           <div style={{ marginTop: 30 }}>
             <div style={{ fontFamily: "Work Sans", fontSize: 22 }}>
-              Trạng thái thanh toán:{" "}
+              Thời gian tạo đơn:{" "}
             </div>
             <div
               style={{
@@ -202,13 +184,23 @@ export default function DetailPage() {
                 color: "#868686",
               }}
             >
-              Chưa thanh toán
+              {/* {orderDetail.length > 0 && orderDetail[0].createdTime} */}
+              {orderDetail.length > 0 && orderDetail[0].createdTime[0]}
+              {"-"}
+              {orderDetail.length > 0 && orderDetail[0].createdTime[1]}
+              {"-"}
+              {orderDetail.length > 0 && orderDetail[0].createdTime[2]}{" "}
+              {orderDetail.length > 0 && orderDetail[0].createdTime[3]}
+              {":"}
+              {orderDetail.length > 0 && orderDetail[0].createdTime[4]}
+              {":"}
+              {orderDetail.length > 0 && orderDetail[0].createdTime[5]}
             </div>
           </div>
 
           <div style={{ fontFamily: "Work Sans", fontSize: 22, marginTop: 30 }}>
             <div style={{ fontFamily: "Work Sans", fontSize: 22 }}>
-              Thời gian đặt hàng:{" "}
+              Địa chỉ giao hàng:{" "}
             </div>
             <div
               style={{
@@ -217,29 +209,38 @@ export default function DetailPage() {
                 color: "#868686",
               }}
             >
-              21-04-2024 07:12
+              {orderDetail.length > 0 && orderDetail[0].deliveryAddress}
             </div>
           </div>
 
           <div style={{ fontFamily: "Work Sans", fontSize: 22, marginTop: 30 }}>
-            Tên khách hàng:{" "}
+            <div style={{ fontFamily: "Work Sans", fontSize: 22 }}>
+              Tên khách hàng:{" "}
+            </div>
+            <div
+              style={{
+                fontFamily: "Work Sans",
+                fontSize: 18,
+                color: "#868686",
+              }}
+            >
+              {orderDetail.length > 0 && orderDetail[0].customerName}
+            </div>
           </div>
 
           <div style={{ fontFamily: "Work Sans", fontSize: 22, marginTop: 30 }}>
-            Số điện thoại:{" "}
-          </div>
-
-          <div style={{ fontFamily: "Work Sans", fontSize: 22, marginTop: 30 }}>
-            Địa chỉ nhận hàng:{" "}
-          </div>
-          <div style={{ fontFamily: "Work Sans", fontSize: 22, marginTop: 30 }}>
-            Nhân viên giao hàng:{" "}
-          </div>
-          <div style={{ fontFamily: "Work Sans", fontSize: 22, marginTop: 30 }}>
-            Mã vận đơn:{" "}
-          </div>
-          <div style={{ fontFamily: "Work Sans", fontSize: 22, marginTop: 30 }}>
-            Mã đơn hàng:{" "}
+            <div style={{ fontFamily: "Work Sans", fontSize: 22 }}>
+              Số điện thoại:{" "}
+            </div>
+            <div
+              style={{
+                fontFamily: "Work Sans",
+                fontSize: 18,
+                color: "#868686",
+              }}
+            >
+              {orderDetail.length > 0 && orderDetail[0].phoneNumber}
+            </div>
           </div>
         </div>
       </div>

@@ -1,65 +1,45 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 import { BsBell, BsSearch } from "react-icons/bs";
 import { Navbar, Nav, Form, Row, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import Dropdown from "react-bootstrap/Dropdown";
+import axios from "axios";
 
 const tableHead = [
   "Mã đơn hàng",
-  "Mã vận đơn",
-  "Ngày giao hàng",
-  "Người giao hàng",
-
-  "Tổng tiền ",
+  "Thời gian tạo",
+  "Tình trạng",
+  "Tên khách hàng",
   "",
 ];
 
-const productOrder = [
-  {
-    orderId: "1",
-    id: "111.1, 111.2",
-    date: "02/05/2024",
-    shipper: "Nguyen Van A",
-
-    total: "200.000 VNĐ",
-  },
-  {
-    orderId: "2",
-    id: "222",
-    date: "02/05/2024",
-    shipper: "Tran Tuan B",
-
-    total: "200.000 VNĐ",
-  },
-  {
-    orderId: "3",
-    id: "333",
-    date: "02/05/2024",
-    shipper: "Le Vu C",
-
-    total: "200.000 VNĐ",
-  },
-  {
-    orderId: "4",
-    id: "444",
-    date: "03/04/2024",
-    shipper: "Ly Thi D",
-
-    total: "200.000 VNĐ",
-  },
-];
-
 const HomePageScreen = () => {
+  const [orders, setOrders] = useState([]);
+  const [result, setResult] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get("/api/v1/order/views")
+      .then((res) => {
+        console.log(res.data.content);
+        setOrders(res.data.content);
+        setResult(res.data.content);
+      })
+      .catch((err) => {
+        // console.error(err);
+      });
+  }, []);
+
   const [searchText, setSearchText] = useState("");
   const handleSearchChange = (e) => {
     setSearchText(e.target.value);
   };
-  const [result, setResult] = useState(productOrder);
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    const filteredResults = productOrder.filter((item) =>
+    const filteredResults = orders.filter((item) =>
       Object.values(item).some(
         (value) =>
           typeof value === "string" &&
@@ -68,10 +48,64 @@ const HomePageScreen = () => {
     );
     setResult(filteredResults);
   };
+
   const navigate = useNavigate();
-  const handleEditButton = (orderId) => {
-    // e.preventDefault();
-    navigate(`/detail/${orderId}`);
+  const handleDetailButton = (order) => {
+    navigate(`/detail/${order.id}`);
+  };
+
+  const handleSortByStatus = () => {
+    const sortedResult = [...result];
+
+    sortedResult.sort((a, b) => {
+      const nameA = a.status.toUpperCase();
+      const nameB = b.status.toUpperCase();
+
+      if (nameA < nameB) {
+        return -1;
+      }
+      if (nameA > nameB) {
+        return 1;
+      }
+      return 0;
+    });
+
+    setResult(sortedResult);
+  };
+
+  const handleSortByTime = () => {
+    const sortedResult = [...result];
+
+    // Sử dụng phương thức sort để sắp xếp các phần tử trong mảng theo thời gian tạo
+    sortedResult.sort((a, b) => {
+      // Chuyển đổi mảng createdTime thành chuỗi để so sánh
+      const timeA = new Date(...a.createdTime).getTime();
+      const timeB = new Date(...b.createdTime).getTime();
+
+      return timeA - timeB;
+    });
+
+    // Lưu kết quả sắp xếp lại vào result
+    setResult(sortedResult);
+  };
+
+  const handleSortByName = () => {
+    const sortedResult = [...result];
+
+    sortedResult.sort((a, b) => {
+      const nameA = a.customerName.toUpperCase();
+      const nameB = b.customerName.toUpperCase();
+
+      if (nameA < nameB) {
+        return -1;
+      }
+      if (nameA > nameB) {
+        return 1;
+      }
+      return 0;
+    });
+
+    setResult(sortedResult);
   };
 
   return (
@@ -91,8 +125,9 @@ const HomePageScreen = () => {
           className="text-center"
           style={{ fontFamily: "Work Sans", fontSize: 40, fontWeight: 500 }}
         >
-          Quản lý đơn hàng chưa được giao
+          Quản lý đơn hàng
         </div>
+
         {/* <div style={{ display: "flex" }}> */}
         <Form
           inline={+true}
@@ -127,23 +162,32 @@ const HomePageScreen = () => {
               width: "190px",
             }}
           >
-            Thêm kiện hàng
+            Sắp xếp theo
           </Button> */}
+          {/* sắp xếp theo status, createdTime, customerName */}
+          <Dropdown style={{ marginLeft: 40 }}>
+            <Dropdown.Toggle style={{ backgroundColor: "#218187" }}>
+              Sắp xếp theo
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu>
+              <Dropdown.Item onClick={handleSortByStatus}>
+                Tình trạng
+              </Dropdown.Item>
+              <Dropdown.Item onClick={handleSortByTime}>
+                Thời gian tạo
+              </Dropdown.Item>
+              <Dropdown.Item onClick={handleSortByName}>
+                Tên khách hàng
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
         </Form>
         {/* </div> */}
+
         <Table responsive className="mt-4" bordered>
           <thead>
             <tr>
-              <th
-                style={{
-                  backgroundColor: "#E1F2F3",
-                  fontFamily: "Work Sans",
-                  fontWeight: 600,
-                }}
-              >
-                STT
-              </th>
-
               {tableHead.map((h, index) => (
                 <th
                   key={index}
@@ -162,16 +206,24 @@ const HomePageScreen = () => {
           <tbody>
             {result.map((order, index) => (
               <tr>
-                <td>{index}</td>
-                <td>{order.orderId}</td>
                 <td>{order.id}</td>
-                <td>{order.date}</td>
-                <td>{order.shipper}</td>
-
-                <td>{order.total}</td>
+                {/* <td>{order.createdTime}</td> */}
+                <td>
+                  {order.createdTime[0]}
+                  {"-"}
+                  {order.createdTime[1]}
+                  {"-"}
+                  {order.createdTime[2]} {order.createdTime[3]}
+                  {":"}
+                  {order.createdTime[4]}
+                  {":"}
+                  {order.createdTime[5]}
+                </td>
+                <td>{order.status}</td>
+                <td>{order.customerName}</td>
                 <td>
                   <div style={{ display: "flex" }}>
-                    <Button
+                    {/* <Button
                       size="sm"
                       style={{
                         color: "#218187",
@@ -185,7 +237,7 @@ const HomePageScreen = () => {
                       }}
                     >
                       Sửa
-                    </Button>
+                    </Button> */}
                     <Button
                       size="sm"
                       style={{
@@ -197,7 +249,7 @@ const HomePageScreen = () => {
                         marginRight: "5px",
                         width: "60px",
                       }}
-                      onClick={() => handleEditButton(order.orderId)}
+                      onClick={() => handleDetailButton(order)}
                     >
                       Chi tiết
                     </Button>
