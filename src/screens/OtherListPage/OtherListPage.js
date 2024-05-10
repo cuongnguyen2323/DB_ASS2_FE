@@ -10,19 +10,20 @@ import axios from "axios";
 
 const tableHead = [
   "Mã đơn hàng",
-  "Thời gian tạo",
-  "Tình trạng",
-  "Tên khách hàng",
-  "",
+  "Loại item",
+  "Mã item",
+  "Tổng tiền",
+  "Trạng thái giao hàng",
+  "Địa chỉ kho hàng",
 ];
 
-const HomePageScreen = () => {
+const OtherListPage = () => {
   const [orders, setOrders] = useState([]);
   const [result, setResult] = useState([]);
 
   useEffect(() => {
     axios
-      .get("/api/v1/order/views")
+      .get("/api/v1/delivery-handling/deliverables")
       .then((res) => {
         console.log(res.data.content);
         setOrders(res.data.content);
@@ -37,7 +38,6 @@ const HomePageScreen = () => {
   const handleSearchChange = (e) => {
     setSearchText(e.target.value);
   };
-
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     const filteredResults = orders.filter((order) =>
@@ -54,17 +54,12 @@ const HomePageScreen = () => {
     setResult(filteredResults);
   };
 
-  const navigate = useNavigate();
-  const handleDetailButton = (order) => {
-    navigate(`/detail/${order.id}`);
-  };
-
   const handleSortByStatus = () => {
     const sortedResult = [...result];
 
     sortedResult.sort((a, b) => {
-      const nameA = a.status.toUpperCase();
-      const nameB = b.status.toUpperCase();
+      const nameA = a.deliveryStatus.toUpperCase();
+      const nameB = b.deliveryStatus.toUpperCase();
 
       if (nameA < nameB) {
         return -1;
@@ -78,25 +73,12 @@ const HomePageScreen = () => {
     setResult(sortedResult);
   };
 
-  const handleSortByTime = () => {
+  const handleSortByType = () => {
     const sortedResult = [...result];
 
     sortedResult.sort((a, b) => {
-      const timeA = new Date(...a.createdTime).getTime();
-      const timeB = new Date(...b.createdTime).getTime();
-
-      return timeA - timeB;
-    });
-
-    setResult(sortedResult);
-  };
-
-  const handleSortByName = () => {
-    const sortedResult = [...result];
-
-    sortedResult.sort((a, b) => {
-      const nameA = a.customerName.toUpperCase();
-      const nameB = b.customerName.toUpperCase();
+      const nameA = a.itemType.toUpperCase();
+      const nameB = b.itemType.toUpperCase();
 
       if (nameA < nameB) {
         return -1;
@@ -127,7 +109,7 @@ const HomePageScreen = () => {
           className="text-center"
           style={{ fontFamily: "Work Sans", fontSize: 40, fontWeight: 500 }}
         >
-          Quản lý đơn hàng
+          Quản lý các sản phẩm và dịch vụ cần phải được giao
         </div>
 
         {/* <div style={{ display: "flex" }}> */}
@@ -173,14 +155,11 @@ const HomePageScreen = () => {
             </Dropdown.Toggle>
 
             <Dropdown.Menu>
+              <Dropdown.Item onClick={handleSortByType}>
+                Loại Item
+              </Dropdown.Item>
               <Dropdown.Item onClick={handleSortByStatus}>
-                Tình trạng
-              </Dropdown.Item>
-              <Dropdown.Item onClick={handleSortByTime}>
-                Thời gian tạo
-              </Dropdown.Item>
-              <Dropdown.Item onClick={handleSortByName}>
-                Tên khách hàng
+                Trạng thái giao hàng
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
@@ -208,68 +187,13 @@ const HomePageScreen = () => {
           <tbody>
             {result.map((order, index) => (
               <tr>
-                <td>{order.id}</td>
-                {/* <td>{order.createdTime}</td> */}
-                <td>
-                  {order.createdTime[0]}
-                  {"-"}
-                  {order.createdTime[1]}
-                  {"-"}
-                  {order.createdTime[2]} {order.createdTime[3]}
-                  {":"}
-                  {order.createdTime[4]}
-                  {":"}
-                  {order.createdTime[5]}
-                </td>
-                <td>{order.status}</td>
-                <td>{order.customerName}</td>
-                <td>
-                  <div style={{ display: "flex" }}>
-                    {/* <Button
-                      size="sm"
-                      style={{
-                        color: "#218187",
-                        border: "1px solid #218187",
-                        backgroundColor: "white",
-                        fontWeight: 500,
-                        flex: 1,
-                        width: "60px",
-                        marginRight: "5px",
-                        // marginLeft: "5px",
-                      }}
-                    >
-                      Sửa
-                    </Button> */}
-                    <Button
-                      size="sm"
-                      style={{
-                        color: "#218187",
-                        border: "1px solid #218187",
-                        backgroundColor: "white",
-                        fontWeight: 500,
-                        flex: 1,
-                        marginRight: "5px",
-                        width: "60px",
-                      }}
-                      onClick={() => handleDetailButton(order)}
-                    >
-                      Chi tiết
-                    </Button>
-                    {/* <Button
-                      size="sm"
-                      style={{
-                        color: "red",
-                        border: "1px solid red",
-                        backgroundColor: "white",
-                        fontWeight: 500,
-                        flex: 1,
-                        // marginLeft: "5px",
-                      }}
-                    >
-                      Xoá
-                    </Button> */}
-                  </div>
-                </td>
+                <td>{order.orderId}</td>
+                <td>{order.itemType}</td>
+                <td>{order.orderItemIds}</td>
+                <td>{order.totalPrice}</td>
+
+                <td>{order.deliveryStatus}</td>
+                <td>{order.sourceLocation}</td>
               </tr>
             ))}
           </tbody>
@@ -279,4 +203,4 @@ const HomePageScreen = () => {
   );
 };
 
-export default HomePageScreen;
+export default OtherListPage;

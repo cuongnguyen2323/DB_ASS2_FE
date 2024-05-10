@@ -60,7 +60,22 @@ export default function Sidebar() {
                   className="ms-2"
                   style={{ fontSize: 20, fontFamily: "Work Sans" }}
                 >
-                  Danh sách
+                  Danh sách 1
+                </span>
+              </a>
+            </li>
+            <li className="nav-item ms-3 ">
+              <a
+                href="/otherlist"
+                className="nav-link fs-5 text-black"
+                aria-current="page"
+              >
+                <i className="bi bi-list-task"></i>
+                <span
+                  className="ms-2"
+                  style={{ fontSize: 20, fontFamily: "Work Sans" }}
+                >
+                  Danh sách 2
                 </span>
               </a>
             </li>
@@ -70,7 +85,7 @@ export default function Sidebar() {
                 className="nav-link text-black fs-5"
                 aria-current="page"
               >
-                <i className="bi bi-calculator"></i>
+                <i className="bi bi-bar-chart"></i>
                 <span
                   className="ms-2 "
                   style={{ fontSize: 20, fontFamily: "Work Sans" }}
